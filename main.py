@@ -110,6 +110,10 @@ def main(args):
     domtree = args.domtree
     frontier = args.frontier
     worklist = args.worklist
+    from_ssa = args.from_ssa
+    to_ssa = args.to_ssa
+    roundtrip = args.roundtrip
+
     verify = args.verify
     viz = args.visualize
     file = args.filename
@@ -157,21 +161,18 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-dom', dest='dom',
+    parser.add_argument('-from-ssa', dest='from_ssa',
                         default=False, action='store_true',
-                        help='print dominator')
-    parser.add_argument('-domtree', dest='domtree',
+                        help='Convert SSA-form program to original')
+    parser.add_argument('-to-ssa', dest='to_ssa',
                         default=False, action='store_true',
-                        help='print dominance tree')
-    parser.add_argument('-frontier', dest='frontier',
+                        help='Convert program to SSA form')
+    parser.add_argument('-roundtrip', dest='roundtrip',
                         default=False, action='store_true',
-                        help='print dominance frontier')
-    parser.add_argument('-worklist', dest='worklist',
+                        help='Convert program to SSA form then convert it back')
+    parser.add_argument('-gvn', dest='gvn',
                         default=False, action='store_true',
-                        help='use worklist algorithm to find dominator')
-    parser.add_argument('-verify', dest='verify',
-                        default=False, action='store_true',
-                        help='verify dominance result')
+                        help='Global Value Numbering')
     parser.add_argument('-visualize', dest='visualize',
                         default=False, action='store_true',
                         help='visualize results')
