@@ -72,6 +72,9 @@ class CFGVisualizer(object):
     
     def show(self):
         self.dot.render(view=True)
+    
+    def save(self, filename):
+        self.dot.render(view=False, format='pdf', filename=filename)
 
 class DomTreeVisualizer(object):
     """
@@ -93,3 +96,6 @@ class DomTreeVisualizer(object):
     
     def show(self):
         self.dot.render(view=True)
+
+    def save(self, filename):
+        self.dot.render(view=False, format='pdf', filename=filename)

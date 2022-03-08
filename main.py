@@ -6,7 +6,7 @@ import sys
 from basic_block import form_basic_blocks
 from control_flow_graph import *
 from visualizer import CFGVisualizer, DomTreeVisualizer
-from printer import dom_tree_printer, frontier_printer
+from to_ssa import cfg_to_ssa
 
 def main(args):
     # get options
@@ -31,26 +31,7 @@ def main(args):
             cfg_visualizer = CFGVisualizer(cfg, func['name'] + '-cfg')
             cfg_visualizer.show()
 
-        if worklist:
-            dom = find_dominator_worklist(cfg)
-        else:
-            dom = find_dominators(cfg)
-
-        if dom_print:
-            # frontier printer also works for dom
-            frontier_printer(dom)
-        
-
-        if domtree:
-            dom_tree = find_dom_tree(dom, cfg)
-            if viz:
-                dom_tree_vis = DomTreeVisualizer(dom_tree, func['name'] + '-domtree')
-                dom_tree_vis.show()
-            dom_tree_printer(dom_tree)
-        
-        if frontier:
-            dom_frontier = find_dom_frontier(dom, cfg)
-            frontier_printer(dom_frontier)
+        cfg_to_ssa(cfg)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
