@@ -26,12 +26,17 @@ def main(args):
     for func in prog['functions']:
         blocks = form_basic_blocks(func['instrs'])
         blocks = [b for b in blocks if len(b) > 0]
-        cfg = CFG(blocks).cfg
+        cfg_object = CFG(blocks)
+        cfg = cfg_object.cfg
         cfg_to_ssa(cfg)
         if viz:        
             cfg_visualizer = CFGVisualizer(cfg, func['name'] + '-cfg')
             cfg_visualizer.show()
 
+        # put updated instrs back to func
+        func['instrs'] = cfg_object.gen_instrs()
+    
+    print(json.dumps(prog, indent=2))
 
 
 if __name__ == "__main__":

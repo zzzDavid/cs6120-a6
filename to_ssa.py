@@ -95,7 +95,6 @@ def rename_var(cfg, defs, phi_blocks, dom_tree):
 
         # Recusively rename all immediate dominance children
         for b in dom_tree[block_name].succs:
-            print(b, end=', ')
             _rename_block(stack, b, cfg[b])
 
         # pop all names we just pushed onto the stacks
