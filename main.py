@@ -7,13 +7,16 @@ from basic_block import form_basic_blocks
 from control_flow_graph import *
 from visualizer import CFGVisualizer, DomTreeVisualizer
 from to_ssa import cfg_to_ssa
+from from_ssa import cfg_from_ssa
 
 def main(args):
     # get options
     from_ssa = args.from_ssa
     to_ssa = args.to_ssa
     roundtrip = args.roundtrip
-    const_fold = args.const_fold
+    if roundtrip:
+        to_ssa = True
+        from_ssa = True
     viz = args.visualize
     file = args.filename
 
@@ -28,7 +31,10 @@ def main(args):
         blocks = [b for b in blocks if len(b) > 0]
         cfg_object = CFG(blocks)
         cfg = cfg_object.cfg
-        cfg_to_ssa(cfg)
+        if to_ssa:
+            cfg_to_ssa(cfg)
+        if from_ssa:
+            cfg_from_ssa(cfg)
         if viz:        
             cfg_visualizer = CFGVisualizer(cfg, func['name'] + '-cfg')
             cfg_visualizer.show()
@@ -50,9 +56,6 @@ if __name__ == "__main__":
     parser.add_argument('-roundtrip', dest='roundtrip',
                         default=False, action='store_true',
                         help='Convert program to SSA form then convert it back')
-    parser.add_argument('-const-fold', dest='const_fold',
-                        default=False, action='store_true',
-                        help='Constant folding with global value numbering')
     parser.add_argument('-visualize', dest='visualize',
                         default=False, action='store_true',
                         help='visualize results')
