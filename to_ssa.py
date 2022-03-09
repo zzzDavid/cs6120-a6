@@ -16,7 +16,7 @@ def get_def(cfg):
                 if var_name not in defs:
                     defs[var_name] = set()
                 defs[var_name].add(block_name)
-                types[var_name] = instr['type']
+                types[var_name] = instr["type"]
     return defs, types
 
 
@@ -47,12 +47,13 @@ def rename_var(cfg, defs, phi_blocks, dom_tree):
         stack[var_name] = [var_name + ".0"]
 
     phi_node_info = {"dest": "", "labels": list(), "args": list()}
-    block_to_phi = dict() # stores block -> phi_node_info mapping
+    block_to_phi = dict()  # stores block -> phi_node_info mapping
     # init block_to_phi
     for block_name in cfg.keys():
         # because each block may have a bunch of phi nodes
         # we use another dict: old_var_name -> phi_node_info
-        if block_name not in phi_blocks: continue
+        if block_name not in phi_blocks:
+            continue
         block_to_phi[block_name] = dict()
         for v in phi_blocks[block_name]:
             block_to_phi[block_name][v] = copy.deepcopy(phi_node_info)
@@ -68,8 +69,8 @@ def rename_var(cfg, defs, phi_blocks, dom_tree):
                 for v in phi_blocks[block_name]:
                     new_dest = v + "." + str(len(stack[v]))
                     stack[v].append(new_dest)
-                    block_to_phi[block_name][v]['dest'] = new_dest
-            
+                    block_to_phi[block_name][v]["dest"] = new_dest
+
             # replace each argument with stack[old_name]
             if "args" in instr:
                 new_args = [stack[arg][-1] for arg in instr["args"]]
@@ -80,18 +81,19 @@ def rename_var(cfg, defs, phi_blocks, dom_tree):
                 instr["dest"] = new_dest
                 # push the new name onto stack
                 stack[old_name].append(new_dest)
-            
+
         # update phi node arglist in successors
         for s in block.succ:
-            if s not in phi_blocks: continue
+            if s not in phi_blocks:
+                continue
             for p in phi_blocks[s]:
                 # assuming p is for a variable v
                 # make it read from stack[v]
                 # we need to update the argument list
                 # of the phi node in successors
                 new_arg = stack[p][-1]
-                block_to_phi[s][p]['args'].append(new_arg)
-                block_to_phi[s][p]['labels'].append(block_name)
+                block_to_phi[s][p]["args"].append(new_arg)
+                block_to_phi[s][p]["labels"].append(block_name)
 
         # Recusively rename all immediate dominance children
         for b in dom_tree[block_name].succs:
@@ -105,6 +107,7 @@ def rename_var(cfg, defs, phi_blocks, dom_tree):
 
     return block_to_phi
 
+
 def insert_phi_nodes(cfg, block_to_phi, types):
     """
     Actually insert phi nodes in the CFG
@@ -113,13 +116,14 @@ def insert_phi_nodes(cfg, block_to_phi, types):
         for v, phi_node in phi_nodes.items():
             typ = types[v]
             phi_node = {
-                'op': 'phi',
-                'dest': phi_node['dest'],
-                'type': typ,
-                'labels': phi_node['labels'],
-                'args': phi_node['args']
+                "op": "phi",
+                "dest": phi_node["dest"],
+                "type": typ,
+                "labels": phi_node["labels"],
+                "args": phi_node["args"],
             }
             cfg[block_name].instrs.insert(0, phi_node)
+
 
 def cfg_to_ssa(cfg):
     defs, types = get_def(cfg)
