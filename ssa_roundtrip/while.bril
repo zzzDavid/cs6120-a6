@@ -1,5 +1,7 @@
-# ARGS: 5
-@main(a: int) {
+@main() {
+.entry1:
+  a: int = const 5;
+  jmp .while.cond;
 .while.cond:
   zero: int = const 0;
   is_term: bool = eq a zero;
