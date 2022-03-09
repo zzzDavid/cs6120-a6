@@ -110,7 +110,17 @@ def insert_phi_nodes(cfg, block_to_phi, types):
     """
     Actually insert phi nodes in the CFG
     """
-    pass
+    for block_name, phi_nodes in block_to_phi.items():
+        for v, phi_node in phi_nodes.items():
+            typ = types[v]
+            phi_node = {
+                'op': 'phi',
+                'dest': phi_node['dest'],
+                'type': typ,
+                'labels': phi_node['labels'],
+                'args': phi_node['args']
+            }
+            cfg[block_name].instrs.insert(0, phi_node)
 
 def cfg_to_ssa(cfg):
     defs, types = get_def(cfg)
