@@ -44,7 +44,7 @@ def rename_var(cfg, defs, phi_blocks, dom_tree):
     stack = dict()  # {old_name : list of new names}
     # initialize the stack
     for var_name in defs.keys():
-        stack[var_name] = [var_name + ".0"]
+        stack[var_name] = list()
 
     phi_node_info = {"dest": "", "labels": list(), "args": list()}
     block_to_phi = dict()  # stores block -> phi_node_info mapping
@@ -60,17 +60,17 @@ def rename_var(cfg, defs, phi_blocks, dom_tree):
 
     def _rename_block(stack, block_name, block):
         # save stack
-        stack_stashed = copy.deepcopy(stack)
+        stack_stashed = copy.deepcopy(stack) 
+
+        # rename phi nodes's destinations
+        if block_name in phi_blocks:
+            # if this block has phi node
+            for v in phi_blocks[block_name]:
+                new_dest = v + "." + str(len(stack[v]))
+                stack[v].append(new_dest)
+                block_to_phi[block_name][v]["dest"] = new_dest
 
         for instr in block.instrs:
-            # rename phi nodes's destinations
-            if block_name in phi_blocks:
-                # if this block has phi node
-                for v in phi_blocks[block_name]:
-                    new_dest = v + "." + str(len(stack[v]))
-                    stack[v].append(new_dest)
-                    block_to_phi[block_name][v]["dest"] = new_dest
-
             # replace each argument with stack[old_name]
             if "args" in instr:
                 new_args = [stack[arg][-1] for arg in instr["args"]]
@@ -91,7 +91,10 @@ def rename_var(cfg, defs, phi_blocks, dom_tree):
                 # make it read from stack[v]
                 # we need to update the argument list
                 # of the phi node in successors
-                new_arg = stack[p][-1]
+                if block_name in defs[p]:
+                    new_arg = stack[p][-1]
+                else:
+                    new_arg = 'undef'
                 block_to_phi[s][p]["args"].append(new_arg)
                 block_to_phi[s][p]["labels"].append(block_name)
 
