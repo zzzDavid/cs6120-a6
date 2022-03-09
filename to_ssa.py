@@ -8,6 +8,7 @@ def get_def(cfg):
     names, where the block defines the variable.
     """
     defs = dict()
+    types = dict()
     for block_name, basic_block in cfg.items():
         for instr in basic_block.instrs:
             if "dest" in instr:
@@ -15,7 +16,8 @@ def get_def(cfg):
                 if var_name not in defs:
                     defs[var_name] = set()
                 defs[var_name].add(block_name)
-    return defs
+                types[var_name] = instr['type']
+    return defs, types
 
 
 def find_phi(cfg, frontier, defs):
@@ -102,11 +104,19 @@ def rename_var(cfg, defs, phi_blocks, dom_tree):
     entry_block_name = list(cfg.keys())[0]
     _rename_block(stack, entry_block_name, cfg[entry_block_name])
 
+    return block_to_phi
+
+def insert_phi_nodes(cfg, block_to_phi, types):
+    """
+    Actually insert phi nodes in the CFG
+    """
+    pass
+
 def cfg_to_ssa(cfg):
-    defs = get_def(cfg)
+    defs, types = get_def(cfg)
     dom = find_dominators(cfg)
     frontier = find_dom_frontier(dom, cfg)
     phi_blocks = find_phi(cfg, frontier, defs)
     dom_tree = find_dom_tree(dom, cfg)
-    rename_var(cfg, defs, phi_blocks, dom_tree)
-    import ipdb; ipdb.set_trace()
+    block_to_phi = rename_var(cfg, defs, phi_blocks, dom_tree)
+    insert_phi_nodes(cfg, block_to_phi, types)

@@ -27,11 +27,12 @@ def main(args):
         blocks = form_basic_blocks(func['instrs'])
         blocks = [b for b in blocks if len(b) > 0]
         cfg = CFG(blocks).cfg
+        cfg_to_ssa(cfg)
         if viz:        
             cfg_visualizer = CFGVisualizer(cfg, func['name'] + '-cfg')
             cfg_visualizer.show()
 
-        cfg_to_ssa(cfg)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
