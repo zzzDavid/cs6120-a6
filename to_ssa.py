@@ -50,11 +50,12 @@ def rename_var(cfg, defs, phi_blocks, dom_tree):
     for block_name in cfg.keys():
         # because each block may have a bunch of phi nodes
         # we use another dict: old_var_name -> phi_node_info
+        if block_name not in phi_blocks: continue
         block_to_phi[block_name] = dict()
         for v in phi_blocks[block_name]:
             block_to_phi[block_name][v] = copy.deepcopy(phi_node_info)
 
-    def _rename_block(block_name, block):
+    def _rename_block(stack, block_name, block):
         # save stack
         stack_stashed = copy.deepcopy(stack)
 
@@ -80,6 +81,7 @@ def rename_var(cfg, defs, phi_blocks, dom_tree):
             
             # update phi node arglist in successors
             for s in block.succ:
+                if s not in phi_blocks: continue
                 for p in phi_blocks[s]:
                     # assuming p is for a variable v
                     # make it read from stack[v]
@@ -91,13 +93,13 @@ def rename_var(cfg, defs, phi_blocks, dom_tree):
 
             # Recusively rename all immediate dominance children
             for b in dom_tree[block_name].succs:
-                _rename_block(b, cfg[b])
+                _rename_block(stack, b, cfg[b])
 
             # pop all names we just pushed onto the stacks
             stack = copy.deepcopy(stack_stashed)
 
     entry_block_name = list(cfg.keys())[0]
-    _rename_block(entry_block_name, cfg[entry_block_name])
+    _rename_block(stack, entry_block_name, cfg[entry_block_name])
 
 
 def cfg_to_ssa(cfg):
