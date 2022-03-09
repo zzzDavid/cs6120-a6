@@ -73,7 +73,7 @@ def rename_var(cfg, defs, phi_blocks, dom_tree):
         for instr in block.instrs:
             # replace each argument with stack[old_name]
             if "args" in instr:
-                new_args = [stack[arg][-1] for arg in instr["args"]]
+                new_args = [stack[arg][-1] if arg in stack else arg for arg in instr["args"]]
                 instr["args"] = new_args
             if "dest" in instr:
                 old_name = instr["dest"]

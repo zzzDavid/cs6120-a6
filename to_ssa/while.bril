@@ -1,4 +1,6 @@
 @main(a: int) {
+.entry1:
+  jmp .while.cond;
 .while.cond:
   zero: int = const 0;
   is_term: bool = eq a zero;
