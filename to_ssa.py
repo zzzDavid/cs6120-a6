@@ -103,7 +103,8 @@ def rename_var(cfg, defs, phi_blocks, dom_tree):
             _rename_block(stack, b, cfg[b])
 
         # pop all names we just pushed onto the stacks
-        stack = copy.deepcopy(stack_stashed)
+        stack.clear()
+        stack.update(stack_stashed)
 
     entry_block_name = list(cfg.keys())[0]
     _rename_block(stack, entry_block_name, cfg[entry_block_name])

@@ -39,9 +39,11 @@ class CFG(object):
                 # natural terminator
                 if idx == len(labels) -1 :
                     # end of function
+                    self.cfg[label].instrs.append({'op': 'ret', 'args': []})
                     continue
                 else:
                     jmp_target = self.cfg[labels[idx + 1]].instrs[0]['label']
+                    self.cfg[label].instrs.append({'op': 'jmp', 'labels': [jmp_target]})
                     if self.reverse:
                         self.cfg[label].pred.append(jmp_target)
                         self.cfg[jmp_target].succ.append(label)
